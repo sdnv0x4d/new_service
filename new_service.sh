@@ -23,7 +23,7 @@ add_nginx_rec() {
   cat << EOF >> $NGINX_CONF_PATH
   
 server {
-   listen $SERVICE_PORT;
+   listen 80;
    server_name $SERVICE_DOMAIN.$DOMAIN;
 
    access_log  /var/log/nginx/$SERVICE_DOMAIN.access.log;
@@ -34,12 +34,12 @@ server {
         proxy_set_header host $SERVICE_DOMAIN.$DOMAIN;
         proxy_pass_request_headers on;
         proxy_http_version 1.1;
-        proxy_set_header upgrade $http_upgrade;
+        proxy_set_header upgrade \$http_upgrade;
         proxy_set_header connection 'upgrade';
-        proxy_set_header x-real-ip $remote_addr;
-        proxy_set_header x-forwarded-for $proxy_add_x_forwarded_for;
-        proxy_set_header x-forwarded-proto $scheme;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header x-real-ip \$remote_addr;
+        proxy_set_header x-forwarded-for \$proxy_add_x_forwarded_for;
+        proxy_set_header x-forwarded-proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
         allow $LOCAL_NET;
         deny all;
    }
