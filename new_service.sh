@@ -15,17 +15,17 @@ CF_API_TOKEN=Cloudflare API Token with Permissions "Zone.DNS"
 add_cf_dns() {
     curl --request POST \
       --url https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records \
-      --header "X-Auth-Email: $CF_EMAIL" \
-      --header "Authorization: Bearer $CF_API_TOKEN" \
-      --header "Content-Type: application/json" \
-      --data "{
-      "content": "$DOCKER_IP",
-      "name": "$SERVICE_DOMAIN",
+      --header 'X-Auth-Email: '$CF_EMAIL'' \
+      --header 'Authorization: Bearer '$CF_API_TOKEN'' \
+      --header 'Content-Type: application/json' \
+      --data '{
+      "content": "'$DOCKER_IP'",
+      "name": "'$SERVICE_DOMAIN'",
       "proxied": false,
       "type": "A",
       "comment": "internal service",
       "ttl": 1
-    }"
+    }'
 }
 
 # Add server record to NGINX confguration
