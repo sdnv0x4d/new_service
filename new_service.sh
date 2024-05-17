@@ -7,6 +7,26 @@ MIKROTIK_IP=10.0.0.1
 DOCKER_IP=10.0.0.2
 LOCAL_NET=10.0.0.0/24
 DOMAIN=example.com
+CF_ZONE_ID=Cloudflare Zone ID from Overiew page
+CF_EMAIL=Cloudflare Email
+CF_API_TOKEN=Cloudflare API Token with Permissions "Zone.DNS"
+
+# Add DNS Record to Cloudflare
+add_cf_dns() {
+    curl --request POST \
+      --url https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records \
+      --header "X-Auth-Email: $CF_EMAIL" \
+      --header "Authorization: Bearer $CF_API_TOKEN" \
+      --header "Content-Type: application/json" \
+      --data "{
+      "content": "$DOCKER_IP",
+      "name": "$SERVICE_DOMAIN",
+      "proxied": false,
+      "type": "A",
+      "comment": "internal service",
+      "ttl": 1
+    }"
+}
 
 # Add server record to NGINX confguration
 add_nginx_rec() {
@@ -132,9 +152,9 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
   docker compose -f $NGINX_PATH down && docker compose -f $NGINX_PATH up -d
 fi
 
-# Connect to mikrotik via SSH & add DNS record
+# Add DNS Record to Cloudflare
 read -p "Add DNS record? Enter 'y' or 'n': " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-  ssh $MIKROTIK_USER@$MIKROTIK_IP "ip/dns/static/add name=$SERVICE_DOMAIN.$DOMAIN type=A address=$DOCKER_IP"
+  add_cf_dns
 fi
